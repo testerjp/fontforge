@@ -7326,7 +7326,7 @@ void SFD_GetFontMetaDataData_Init( SFD_GetFontMetaDataData* d )
 }
 
 
-void SFD_GetFontMetaData( FILE *sfd,
+int SFD_GetFontMetaData( FILE *sfd,
 			  char *tok,
 			  SplineFont *sf,
 			  SFD_GetFontMetaDataData* d )
@@ -8021,7 +8021,11 @@ void SFD_GetFontMetaData( FILE *sfd,
 	/* text number format */
 	SFDGetShortTable(sfd,sf,d->lastttf);
     }
-
+    else
+    {
+return 0;
+    }
+return 1;
 }
 
 
@@ -8065,10 +8069,11 @@ static SplineFont *SFD_GetFont( FILE *sfd,SplineFont *cidmaster,char *tok,
 	}
 
 
-	SFD_GetFontMetaData( sfd, tok, sf, &d );
-	had_layer_cnt = d.had_layer_cnt;
-
-	if ( strmatch(tok,"DisplaySize:")==0 )
+	if ( SFD_GetFontMetaData( sfd, tok, sf, &d ) )
+        {
+	    had_layer_cnt = d.had_layer_cnt;
+        }
+	else if ( strmatch(tok,"DisplaySize:")==0 )
 	{
 	    getint(sfd,&sf->display_size);
 	}
