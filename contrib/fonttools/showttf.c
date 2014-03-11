@@ -3848,6 +3848,8 @@ static void readttfkern_context(FILE *ttf, FILE *util, struct ttfinfo *info, int
     struct statetable *st;
 
     st = read_statetable(ttf,0,false,info);
+    if ( st==NULL )
+	return;
     st->len = stab_len;
     show_statetable(st, info, ttf, show_contextkerndata);
 }
@@ -3920,6 +3922,8 @@ static void readttfmort_indic(FILE *ttf, FILE *util, struct ttfinfo *info, int s
     struct statetable *st;
 
     st = read_statetable(ttf,0,false,info);
+    if ( st==NULL )
+	return;
     show_statetable(st, info, ttf, show_indicflags);
 }
 
@@ -3927,6 +3931,8 @@ static void readttfmorx_indic(FILE *ttf, FILE *util, struct ttfinfo *info, int s
     struct statetable *st;
 
     st = read_statetable(ttf,2,true,info);
+    if ( st==NULL )
+	return;
     show_statetablex(st, info, ttf, show_indicflags);
 }
 
@@ -4013,6 +4019,8 @@ static void readttfmort_context(FILE *ttf, FILE *util, struct ttfinfo *info, int
     struct statetable *st;
 
     st = read_statetable(ttf,2,false,info);
+    if ( st==NULL )
+	return;
     show_statetable(st, info, ttf, show_contextflags);
 }
 
@@ -4056,6 +4064,8 @@ static void readttfmorx_context(FILE *ttf, FILE *util, struct ttfinfo *info, int
     struct statetable *st;
 
     st = read_statetable(ttf,2,true,info);
+    if ( st==NULL )
+	return;
     show_statetablex(st, info, ttf, show_contextflagsx);
 }
 
@@ -4094,6 +4104,8 @@ static void readttfmort_lig(FILE *ttf, FILE *util, struct ttfinfo *info, int sta
     struct statetable *st;
 
     st = read_statetable(ttf,0,false,info);
+    if ( st==NULL )
+	return;
     show_statetable(st, info, ttf, show_ligflags);
 }
 
@@ -4138,6 +4150,8 @@ static void readttfmorx_lig(FILE *ttf, FILE *util, struct ttfinfo *info, int sta
     struct statetable *st;
 
     st = read_statetable(ttf,1,true,info);
+    if ( st==NULL )
+	return;
     show_statetablex(st, info, ttf, show_ligxflags);
 }
 
