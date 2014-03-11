@@ -3683,10 +3683,14 @@ static void readttf_applelookup(FILE *ttf,struct ttfinfo *info,
 }
 
 static void mortclass_apply_values(struct ttfinfo *info, int gfirst, int glast,FILE *ttf) {
+    uint16 class;
     int i;
 
+    class = getushort(ttf);
+
     for ( i=gfirst; i<=glast; ++i )
-	info->morx_classes[i] = getushort(ttf);
+	if ( i != 0xffff )
+	    info->morx_classes[i] = class;
 }
 
 static void mortclass_apply_value(struct ttfinfo *info, int gfirst, int glast,FILE *ttf) {
@@ -3696,7 +3700,8 @@ static void mortclass_apply_value(struct ttfinfo *info, int gfirst, int glast,FI
     class = getushort(ttf);
 
     for ( i=gfirst; i<=glast; ++i )
-	info->morx_classes[i] = class;
+	if ( i != 0xffff )
+	    info->morx_classes[i] = class;
 }
 
 static struct statetable *read_statetable(FILE *ttf, int ent_extras, int ismorx, struct ttfinfo *info) {
