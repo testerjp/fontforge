@@ -3930,7 +3930,7 @@ static void readttfmort_indic(FILE *ttf, FILE *util, struct ttfinfo *info, int s
 static void readttfmorx_indic(FILE *ttf, FILE *util, struct ttfinfo *info, int stab_len) {
     struct statetable *st;
 
-    st = read_statetable(ttf,2,true,info);
+    st = read_statetable(ttf,0,true,info);
     if ( st==NULL )
 	return;
     show_statetablex(st, info, ttf, show_indicflags);
