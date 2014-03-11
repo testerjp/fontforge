@@ -4088,8 +4088,9 @@ return;
     do {
 	val = getlong(ttf);
 	printf( "\t    lig action %08x %s offset=%d\n", val,
-		(val&0x80000000)?"last (& store)": 
-		(val&0x40000000)?"store": "delete",
+		((val&0xc0000000)==0xc0000000)? "last | store":
+		((val&0xc0000000)==0x80000000)? "last":
+		((val&0xc0000000)==0x40000000)? "store": "delete",
 		(((int32)val)<<2)>>2 );		/* Sign extend */
 	/* I think we take 2 * (glyph_id-st->first_glyph + offset) + state_start */
 	/*  we get the ?ushort? at this file address and we add it to an */
@@ -4133,10 +4134,11 @@ return;
     fseek(ttf,st->state_start+st->extra_offsets[0]+4*index,SEEK_SET);
     do {
 	val = getlong(ttf);
-	printf( "\t    lig action %08x %s offset=%d\n", val,
-		(val&0x80000000)?"last (& store)": 
-		(val&0x40000000)?"store": "delete",
-		(((int32)val)<<2)>>2 );		/* Sign extend */
+	printf( "\t    lig action %08x %s offset=%d\n",val,
+		((val&0xc0000000)==0xc0000000)? "last | store":
+		((val&0xc0000000)==0x80000000)? "last":
+		((val&0xc0000000)==0x40000000)? "store": "delete",
+		(((int32)val)<<2)>>2);         /* Sign extend */
 	/* I think we take 2 * (glyph_id-st->first_glyph + offset) + state_start */
 	/*  we get the ?ushort? at this file address and we add it to an */
 	/*  accumulated total. When we finally get to a store (or last) */
