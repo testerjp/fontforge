@@ -1462,7 +1462,6 @@ return;
 	} else {
 	    fprintf( stderr, "I don't recognize this font format. It isn't mentioned in my documentation.\nSorry.\n" );
 	}
-	freedata(&hdr);
     }
     fclose(pcl);
 }

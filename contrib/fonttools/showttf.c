@@ -3850,7 +3850,6 @@ static void readttfkern_context(FILE *ttf, FILE *util, struct ttfinfo *info, int
     st = read_statetable(ttf,0,false,info);
     st->len = stab_len;
     show_statetable(st, info, ttf, show_contextkerndata);
-    free_statetable(st);
 }
 
 static void show_indicflags(uint8 *entry,struct statetable *st,struct ttfinfo *info,FILE *ttf) {
@@ -3922,7 +3921,6 @@ static void readttfmort_indic(FILE *ttf, FILE *util, struct ttfinfo *info, int s
 
     st = read_statetable(ttf,0,false,info);
     show_statetable(st, info, ttf, show_indicflags);
-    free_statetable(st);
 }
 
 static void readttfmorx_indic(FILE *ttf, FILE *util, struct ttfinfo *info, int stab_len) {
@@ -3930,7 +3928,6 @@ static void readttfmorx_indic(FILE *ttf, FILE *util, struct ttfinfo *info, int s
 
     st = read_statetable(ttf,2,true,info);
     show_statetablex(st, info, ttf, show_indicflags);
-    free_statetable(st);
 }
 
 static void show_contextflags(uint8 *entry,struct statetable *st,struct ttfinfo *info, FILE *ttf) {
@@ -4017,7 +4014,6 @@ static void readttfmort_context(FILE *ttf, FILE *util, struct ttfinfo *info, int
 
     st = read_statetable(ttf,2,false,info);
     show_statetable(st, info, ttf, show_contextflags);
-    free_statetable(st);
 }
 
 static void mort_noncontextualsubs_glyph( FILE *ttf, struct ttfinfo *info ) {
@@ -4061,7 +4057,6 @@ static void readttfmorx_context(FILE *ttf, FILE *util, struct ttfinfo *info, int
 
     st = read_statetable(ttf,2,true,info);
     show_statetablex(st, info, ttf, show_contextflagsx);
-    free_statetable(st);
 }
 
 static void show_ligflags(uint8 *entry,struct statetable *st,struct ttfinfo *info, FILE *ttf) {
@@ -4100,7 +4095,6 @@ static void readttfmort_lig(FILE *ttf, FILE *util, struct ttfinfo *info, int sta
 
     st = read_statetable(ttf,0,false,info);
     show_statetable(st, info, ttf, show_ligflags);
-    free_statetable(st);
 }
 
 static void show_ligxflags(uint8 *entry,struct statetable *st,struct ttfinfo *info, FILE *ttf) {
@@ -4145,7 +4139,6 @@ static void readttfmorx_lig(FILE *ttf, FILE *util, struct ttfinfo *info, int sta
 
     st = read_statetable(ttf,1,true,info);
     show_statetablex(st, info, ttf, show_ligxflags);
-    free_statetable(st);
 }
 
 static int32 memlong(uint8 *data,int offset) {
