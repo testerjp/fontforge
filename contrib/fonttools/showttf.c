@@ -4189,7 +4189,7 @@ static void mort_figure_ligatures(struct statemachine *sm, int lcp, int off, int
 return;
 
     lig = memlong(sm->data,off);
-    off += sizeof(long);
+    off += sizeof(uint32);
 
     for ( i=0; i<sm->info->glyph_cnt; ++i ) if ( sm->classes[i]==sm->lig_comp_classes[lcp] ) {
 	sm->lig_comp_glyphs[lcp] = i;
@@ -4348,12 +4348,12 @@ return;
     fseek(ttf,here,SEEK_SET);
     if ( ismorx ) {
 	sm.nClasses = memlong(sm.data,0);
-	sm.classOffset = memlong(sm.data,sizeof(long));
-	sm.stateOffset = memlong(sm.data,2*sizeof(long));
-	sm.entryOffset = memlong(sm.data,3*sizeof(long));
-	sm.ligActOff = memlong(sm.data,4*sizeof(long));
-	sm.compOff = memlong(sm.data,5*sizeof(long));
-	sm.ligOff = memlong(sm.data,6*sizeof(long));
+	sm.classOffset = memlong(sm.data,sizeof(uint32));
+	sm.stateOffset = memlong(sm.data,2*sizeof(uint32));
+	sm.entryOffset = memlong(sm.data,3*sizeof(uint32));
+	sm.ligActOff = memlong(sm.data,4*sizeof(uint32));
+	sm.compOff = memlong(sm.data,5*sizeof(uint32));
+	sm.ligOff = memlong(sm.data,6*sizeof(uint32));
 	fseek(ttf,here+sm.classOffset,SEEK_SET);
 	sm.classes = info->morx_classes = malloc(info->glyph_cnt*sizeof(uint16));
 	for ( i=0; i<info->glyph_cnt; ++i )
