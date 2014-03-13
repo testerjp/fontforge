@@ -4162,6 +4162,116 @@ static void readttfmorx_lig(FILE *ttf, FILE *util, struct ttfinfo *info, int sta
     show_statetablex(st, info, ttf, show_ligxflags);
 }
 
+static void show_insertionflags(uint8 *entry,struct statetable *st,struct ttfinfo *info, FILE *ttf) {
+    int flags = (entry[2]<<8)|entry[3];
+    int cur_count = (flags&0x03e0)>>5;
+    int mark_count = (flags&0x001f);
+    int cur_offset = (int16) ((entry[4]<<8)|entry[5]);
+    int mark_offset = (int16) ((entry[6]<<8)|entry[7]);
+    int i;
+
+    printf( "\t   Flags %04x ", flags );
+    if ( flags&0x8000 )
+	printf( "Set Mark | ");
+    if ( flags&0x2000 )
+	printf( "Current Is Kashida Like | ");
+    if ( flags&0x1000 )
+	printf( "Marked Is Kashida Like | ");
+    if ( flags&0x0800 )
+	printf( "Current Insert Before | ");
+    if ( flags&0x0400 )
+	printf( "Marked Insert Before | ");
+    if ( flags&0x4000 )
+	printf( "Don't Advance Glyph\n" );
+    else
+	printf( "Advance Glyph\n" );
+    if ( cur_count )
+	printf( "\t   Current Insert Count %d\n", cur_count );
+    if ( mark_count )
+	printf( "\t   Marked Insert Count %d\n", mark_count );
+    if ( cur_offset ) {
+	fseek(ttf,st->state_start+cur_offset,SEEK_SET);
+	for ( i=0; i<cur_count; ++i ) {
+	    int gid  = getushort(ttf);
+	    printf( "\t    Insertion Glyph %d (%s)\n",
+		    gid, gid>=info->glyph_cnt ? "!!!! Bad Glyph !!!!" : info->glyph_names!=NULL ? info->glyph_names[gid] : "" );
+	}
+    }
+    if ( mark_offset ) {
+	fseek(ttf,st->state_start+mark_offset,SEEK_SET);
+	for ( i=0; i<mark_count; ++i ) {
+	    int gid  = getushort(ttf);
+	    printf( "\t    Insertion Glyph %d (%s)\n",
+		    gid, gid>=info->glyph_cnt ? "!!!! Bad Glyph !!!!" : info->glyph_names!=NULL ? info->glyph_names[gid] : "" );
+	}
+    }
+}
+
+static void readttfmort_insertion(FILE *ttf, FILE *util, struct ttfinfo *info, int stab_len) {
+    struct statetable *st;
+
+    st = read_statetable(ttf,2,false,info);
+    if ( st==NULL )
+	return;
+    show_statetablex(st, info, ttf, show_insertionflags);
+    free_statetable(st);
+}
+
+static void show_insertionxflags(uint8 *entry,struct statetable *st,struct ttfinfo *info, FILE *ttf) {
+    int flags = (entry[2]<<8)|entry[3];
+    int cur_count = (flags&0x03e0)>>5;
+    int mark_count = (flags&0x001f);
+    int cur_offset = (int16) ((entry[4]<<8)|entry[5]);
+    int mark_offset = (int16) ((entry[6]<<8)|entry[7]);
+    int i;
+
+    printf( "\t   Flags %04x ", flags );
+    if ( flags&0x8000 )
+	printf( "Set Mark | ");
+    if ( flags&0x2000 )
+	printf( "Current Is Kashida Like | ");
+    if ( flags&0x1000 )
+	printf( "Marked Is Kashida Like | ");
+    if ( flags&0x0800 )
+	printf( "Current Insert Before | ");
+    if ( flags&0x0400 )
+	printf( "Marked Insert Before | ");
+    if ( flags&0x4000 )
+	printf( "Don't Advance Glyph\n" );
+    else
+	printf( "Advance Glyph\n" );
+    if ( cur_count )
+	printf( "\t   Current Insert Count %d\n", cur_count );
+    if ( mark_count )
+	printf( "\t   Marked Insert Count %d\n", mark_count );
+    if ( cur_offset!=0xFFFF ) {
+	fseek(ttf,st->state_start+st->extra_offsets[0]+2*cur_offset,SEEK_SET);
+	for ( i=0; i<cur_count; ++i ) {
+	    int gid  = getushort(ttf);
+	    printf( "\t    Insertion Glyph %d (%s)\n",
+		    gid, gid>=info->glyph_cnt ? "!!!! Bad Glyph !!!!" : info->glyph_names!=NULL ? info->glyph_names[gid] : "" );
+	}
+    }
+    if ( mark_offset!=0xFFFF ) {
+	fseek(ttf,st->state_start+st->extra_offsets[0]+2*mark_offset,SEEK_SET);
+	for ( i=0; i<mark_count; ++i ) {
+	    int gid  = getushort(ttf);
+	    printf( "\t    Insertion Glyph %d (%s)\n",
+		    gid, gid>=info->glyph_cnt ? "!!!! Bad Glyph !!!!" : info->glyph_names!=NULL ? info->glyph_names[gid] : "" );
+	}
+    }
+}
+
+static void readttfmorx_insertion(FILE *ttf, FILE *util, struct ttfinfo *info, int stab_len) {
+    struct statetable *st;
+
+    st = read_statetable(ttf,2,true,info);
+    if ( st==NULL )
+	return;
+    show_statetablex(st, info, ttf, show_insertionxflags);
+    free_statetable(st);
+}
+
 static int32 memlong(uint8 *data,int offset) {
     int ch1 = data[offset], ch2 = data[offset+1], ch3 = data[offset+2], ch4 = data[offset+3];
 return( (ch1<<24)|(ch2<<16)|(ch3<<8)|ch4 );
@@ -4495,6 +4605,10 @@ static void readttfmetamorph(FILE *ttf, FILE *util, struct ttfinfo *info) {
 			mort_noncontextualsubs_glyph);
 	      break;
 	      case 5:
+		if ( !ismorx )
+		    readttfmort_insertion(ttf,util,info,stab_len);
+		else
+		    readttfmorx_insertion(ttf,util,info,stab_len);
 	      break;
 	    }
 	    fseek(ttf,stab_start+stab_len,SEEK_SET);
