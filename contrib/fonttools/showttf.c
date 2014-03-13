@@ -2877,6 +2877,41 @@ static void readttfgdef(FILE *ttf, FILE *util, struct ttfinfo *info) {
     if ( lco!=0 ) gdefshowligcaretlist(ttf,info->gdef_start+lco,info);
 }
 
+static void readttfkern_kerningpair(FILE *ttf, FILE *util, struct ttfinfo *info) {
+    int i, len, coverage;
+
+    printf( "\t Sub-table %d, version=%d\n", i, getushort(ttf));
+    len = getushort(ttf);
+    coverage = getushort(ttf);
+    printf( "\t  len=%d coverage=%x %s%s%s%s sub table format=%d\n", len, coverage,
+	    ( coverage&1 ) ? "Horizontal": "Vertical",
+	    ( coverage&2 ) ? " Minimum" : "",
+	    ( coverage&4 ) ? " cross-stream" : "",
+	    ( coverage&8 ) ? " override" : "",
+	    ( coverage>>8 ));
+    if ( (coverage>>8)==0 ) {
+	/* Kern pairs */
+	int n = getushort(ttf);
+	int sr = getushort(ttf);
+	int es = getushort(ttf);
+	int rs = getushort(ttf);
+	printf( "\t   npairs=%d searchRange=%d entrySelector=%d rangeShift=%d\n",
+		n, sr, es, rs );
+	for ( i=0; i<n; ++i ) {
+	    int left, right, val;
+	    left = getushort(ttf);
+	    right = getushort(ttf);
+	    val = (short) getushort(ttf);
+	    if ( info->glyph_names!=NULL && left<info->glyph_cnt && right<info->glyph_cnt ) {
+		printf( "\t\t%s %s %d\n", info->glyph_names[left],
+			info->glyph_names[right], val );
+	    } else {
+		printf( "\t\t%d %d %d\n", left, right, val );
+	    }
+	}
+    }
+}
+
 static void readttfkern_context(FILE *ttf, FILE *util, struct ttfinfo *info, int stab_len);
 static void readttfkern(FILE *ttf, FILE *util, struct ttfinfo *info) {
     int version, ntables;
@@ -2901,36 +2936,7 @@ static void readttfkern(FILE *ttf, FILE *util, struct ttfinfo *info) {
     for ( i=0; i<ntables; ++i ) {
 	begin = ftell(ttf);
 	if ( version==0 ) {
-	    printf( "\t Sub-table %d, version=%d\n", i, getushort(ttf));
-	    len = getushort(ttf);
-	    coverage = getushort(ttf);
-	    printf( "\t  len=%d coverage=%x %s%s%s%s sub table format=%d\n", len, coverage,
-		    ( coverage&1 ) ? "Horizontal": "Vertical",
-		    ( coverage&2 ) ? " Minimum" : "",
-		    ( coverage&4 ) ? " cross-stream" : "",
-		    ( coverage&8 ) ? " override" : "",
-		    ( coverage>>8 ));
-	    if ( (coverage>>8)==0 ) {
-		/* Kern pairs */
-		int n = getushort(ttf);
-		int sr = getushort(ttf);
-		int es = getushort(ttf);
-		int rs = getushort(ttf);
-		printf( "\t   npairs=%d searchRange=%d entrySelector=%d rangeShift=%d\n",
-			n, sr, es, rs );
-		for ( i=0; i<n; ++i ) {
-		    int left, right, val;
-		    left = getushort(ttf);
-		    right = getushort(ttf);
-		    val = (short) getushort(ttf);
-		    if ( info->glyph_names!=NULL && left<info->glyph_cnt && right<info->glyph_cnt ) {
-			printf( "\t\t%s %s %d\n", info->glyph_names[left],
-				info->glyph_names[right], val );
-		    } else {
-			printf( "\t\t%d %d %d\n", left, right, val );
-		    }
-		}
-	    }
+	    readttfkern_kerningpair(ttf, util, info);
 	    fseek(ttf,begin+header_size,SEEK_SET);
 	} else {
 	    len = getlong(ttf);
@@ -2942,6 +2948,9 @@ static void readttfkern(FILE *ttf, FILE *util, struct ttfinfo *info) {
 		    ( coverage&0xff ));
 	    printf( "\t  tuple index=%d\n", getushort(ttf));
 	    switch ( (coverage&0xff) ) {
+	      case 0:
+		readttfkern_kerningpair(ttf, util, info);
+	      break;
 	      case 1:
 		readttfkern_context(ttf,util, info, len-6);
 	      break;
