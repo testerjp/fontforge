@@ -2878,36 +2878,23 @@ static void readttfgdef(FILE *ttf, FILE *util, struct ttfinfo *info) {
 }
 
 static void readttfkern_kerningpair(FILE *ttf, FILE *util, struct ttfinfo *info) {
-    int i, len, coverage;
-
-    printf( "\t Sub-table %d, version=%d\n", i, getushort(ttf));
-    len = getushort(ttf);
-    coverage = getushort(ttf);
-    printf( "\t  len=%d coverage=%x %s%s%s%s sub table format=%d\n", len, coverage,
-	    ( coverage&1 ) ? "Horizontal": "Vertical",
-	    ( coverage&2 ) ? " Minimum" : "",
-	    ( coverage&4 ) ? " cross-stream" : "",
-	    ( coverage&8 ) ? " override" : "",
-	    ( coverage>>8 ));
-    if ( (coverage>>8)==0 ) {
-	/* Kern pairs */
-	int n = getushort(ttf);
-	int sr = getushort(ttf);
-	int es = getushort(ttf);
-	int rs = getushort(ttf);
-	printf( "\t   npairs=%d searchRange=%d entrySelector=%d rangeShift=%d\n",
-		n, sr, es, rs );
-	for ( i=0; i<n; ++i ) {
-	    int left, right, val;
-	    left = getushort(ttf);
-	    right = getushort(ttf);
-	    val = (short) getushort(ttf);
-	    if ( info->glyph_names!=NULL && left<info->glyph_cnt && right<info->glyph_cnt ) {
-		printf( "\t\t%s %s %d\n", info->glyph_names[left],
-			info->glyph_names[right], val );
-	    } else {
-		printf( "\t\t%d %d %d\n", left, right, val );
-	    }
+    int i;
+    int n = getushort(ttf);
+    int sr = getushort(ttf);
+    int es = getushort(ttf);
+    int rs = getushort(ttf);
+    printf( "\t   npairs=%d searchRange=%d entrySelector=%d rangeShift=%d\n",
+	    n, sr, es, rs );
+    for ( i=0; i<n; ++i ) {
+	int left, right, val;
+	left = getushort(ttf);
+	right = getushort(ttf);
+	val = (short) getushort(ttf);
+	if ( info->glyph_names!=NULL && left<info->glyph_cnt && right<info->glyph_cnt ) {
+	    printf( "\t\t%s %s %d\n", info->glyph_names[left],
+		    info->glyph_names[right], val );
+	} else {
+	    printf( "\t\t%d %d %d\n", left, right, val );
 	}
     }
 }
@@ -2936,7 +2923,17 @@ static void readttfkern(FILE *ttf, FILE *util, struct ttfinfo *info) {
     for ( i=0; i<ntables; ++i ) {
 	begin = ftell(ttf);
 	if ( version==0 ) {
-	    readttfkern_kerningpair(ttf, util, info);
+	    printf( "\t Sub-table %d, version=%d\n", i, getushort(ttf));
+	    len = getushort(ttf);
+	    coverage = getushort(ttf);
+	    printf( "\t  len=%d coverage=%x %s%s%s%s sub table format=%d\n", len, coverage,
+		    ( coverage&1 ) ? "Horizontal": "Vertical",
+		    ( coverage&2 ) ? " Minimum" : "",
+		    ( coverage&4 ) ? " cross-stream" : "",
+		    ( coverage&8 ) ? " override" : "",
+		    ( coverage>>8 ));
+	    if ( (coverage>>8)==0 )
+		readttfkern_kerningpair(ttf, util, info);
 	    fseek(ttf,begin+header_size,SEEK_SET);
 	} else {
 	    len = getlong(ttf);
@@ -4223,7 +4220,6 @@ static void readttfmort_insertion(FILE *ttf, FILE *util, struct ttfinfo *info, i
     if ( st==NULL )
 	return;
     show_statetablex(st, info, ttf, show_insertionflags);
-    free_statetable(st);
 }
 
 static void show_insertionxflags(uint8 *entry,struct statetable *st,struct ttfinfo *info, FILE *ttf) {
@@ -4278,7 +4274,6 @@ static void readttfmorx_insertion(FILE *ttf, FILE *util, struct ttfinfo *info, i
     if ( st==NULL )
 	return;
     show_statetablex(st, info, ttf, show_insertionxflags);
-    free_statetable(st);
 }
 
 static int32 memlong(uint8 *data,int offset) {
