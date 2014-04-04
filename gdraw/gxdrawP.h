@@ -82,6 +82,7 @@ capable of using composite.
 #include "gdrawP.h"
 
 #ifdef HAVE_PTHREAD_H
+# include <gc/gc.h> /* Makes some necessary redefinitions */
 # include <pthread.h>
 #endif
 
@@ -196,7 +197,6 @@ struct seldata {
     void *data;
     void *(*gendata)(void *,int32 *len);
     /* Either the data are stored here, or we use this function to generate them on the fly */
-    void (*freedata)(void *);
     struct seldata *next;
 };
 

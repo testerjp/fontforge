@@ -27,7 +27,7 @@
 #ifndef _BASICS_H
 #define _BASICS_H
 
-# include <fontforge-config.h>
+#include <fontforge-config.h>
 #include <stdio.h>		/* for NULL */
 #ifdef HAVE_STDINT_H
 # include <stdint.h>
@@ -36,11 +36,11 @@
 #endif
 #include <stdlib.h>		/* for free */
 #include <limits.h>
+#include <stdbool.h>
+#include "gl_xlist.h"
+#include "gl_linked_list.h"
+#define gl_list_new() gl_list_create_empty(GL_LINKED_LIST, NULL, NULL, NULL, false)
 
-#define true 1
-#define false 0
-
-typedef int bool;
 typedef int32_t		int32;
 typedef uint32_t	uint32;
 typedef int16_t		int16;
